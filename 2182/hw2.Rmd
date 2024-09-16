@@ -1,0 +1,71 @@
+---
+title: "HW2"
+author: "Andrew Shao"
+date: "2024-09-13"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2.2.4 Q1
+```{r}
+vec_1 <- c(7, 24, 8, 26)
+length(vec_1)
+```
+```{r}
+class(vec_1)
+```
+
+## 2.2.4 Q2
+```{r}
+char_1 <- c('I', 'am', 'learning', 'R!')
+length(char_1)
+```
+```{r}
+class(char_1)
+```
+```{r}
+paste(char_1, collapse = ' ')
+```
+
+## 2.2.4 Q3
+```{r}
+nchar(char_1)
+```
+```{r}
+toupper(char_1)
+```
+
+## 2.2.4 Q4
+```{r}
+is_char <- c(is.character(vec_1), is.character(char_1))
+is_char
+```
+
+## 2.3.3 Q1
+```{r}
+x1 <- c(1, 2, 3)
+logi_1 <- x1 <= x1 ** 2
+logi_1
+```
+
+## 2.3.3 Q2
+```{r}
+logi_2 <- c(TRUE, TRUE, FALSE)
+logi_3 <- c(is.integer(logi_2), is.double(logi_2), is.character(logi_2), is.logical(logi_2))
+logi_3
+```
+
+## 2.6.6 Q1
+```{r}
+seq1 <- 1:5*2
+seq1
+```
+```{r}
+seq2 <- seq(2, 10, 2)
+seq2
+```
+```{r}
+seq3 <- seq

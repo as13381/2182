@@ -1,0 +1,39 @@
+---
+title: "In Class Hw 1"
+author: "Andrew Shao"
+date: "2024-09-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1.1.4 Q1
+
+The code that returns an error message is `install.packages(r02pro)`.
+
+## 1.1.4 Q2
+
+```{r}
+library(r02pro)
+```
+
+## 1.2.7 Q1
+
+```{r}
+sqrt(5 * 5)
+```
+
+## 1.2.7 Q3
+
+```{r}
+round(pi ** 2, 4)
+```
+
+## 1.3.6 Q1
+
+```{r}
+num_1 <- 20
+```
+
