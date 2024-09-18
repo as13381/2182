@@ -68,4 +68,82 @@ seq2 <- seq(2, 10, 2)
 seq2
 ```
 ```{r}
-seq3 <- seq
+seq3 <- seq(5) * 2
+seq3
+```
+```{r}
+seq4 <- seq(from = 2, by = 2, length.out = 5)
+seq4
+```
+```{r}
+seq5 <- seq(to = 10, by = 2, length.out = 5)
+seq5
+```
+
+## 2.6.6 Q2
+```{r}
+seq6 <- rep(c(2, 6, 8), each = 2, times = 2)
+seq6
+```
+```{r}
+seq7 <- rep(c(rep(2, 2), rep(6, 2), rep(8, 2)), 2)
+seq7
+```
+
+# 2.6.6 Q3
+```{r}
+sec8 <- c(1:3, 1:5, 1:7)
+sec8
+```
+```{r}
+table(sec8)
+```
+```{r}
+sec9 <- c(rep(1:3, 2), 4:5, 1:7)
+sec9
+```
+```{r}
+table(sec9)
+```
+
+## 2.9.4 Q1
+```{r}
+rep(c('a', 'b', 'c', 'd'), 3)
+```
+```{r}
+rep(c('a', 'b', 'c', 'd'), each = 3)
+```
+```{r}
+rep(c('a', 'b', 'c', 'd'), c(4:1))
+```
+
+## 2.9.4 Q2
+```{r}
+paste(c('Alice', 'Bob', 'Charlie'), 'has been playing', c('tennis', 'soccer', 'baseball'), 'for', 4:2, 'years in', c('London.', 'New York.', 'Berlin.ca'))
+```
+
+## 2.14.4 Q1
+```{r}
+s1 <- seq(from = 1, to = 100, length.out = 7)
+s2 <- s1 > 50
+s3 <- s1 <= 80
+```
+
+## 2.14.4 Q2
+```{r}
+s1[s2 & s3]
+```
+```{r}
+intersect(s1[s2], s1[s3])
+```
+
+## 2.14.4 Q3
+```{r}
+x <- 1:200
+x1 <- x %% 7 == 0
+x2 <-  x %% 2 != 0
+x[x1 & x2]
+```
+```{r}
+intersect(x[x1], x[x2])
+```
