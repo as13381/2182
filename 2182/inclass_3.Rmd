@@ -1,0 +1,99 @@
+---
+title: "In Class Assignment 3"
+author: "Andrew Shao"
+date: "2024-09-18"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2.11.4 Q1
+One advantage is it stores values as integers which takes less space. Another advantage is that it detects new input that is not in the levels which is useful for catching input mistakes.
+
+## 2.11.4 Q2
+C
+
+## 2.11.4 Q3
+A
+
+## 2.11.4 Q4
+B
+
+## 2.11.4 Q5
+```{r}
+size <- rep(c("big", "small", "medium"), 3:1)
+size <- factor(size, ordered = T, levels = c('small', 'medium', 'big'))
+size
+```
+
+## 3.1.7 Q1
+```{r}
+x <- diag(rep(1, 6)) + 1
+x
+```
+
+## 3.1.7 Q2
+```{r}
+x <- matrix(1:16, 4, 4)
+colMeans(x)
+```
+
+## 3.1.7 Q3
+```{r}
+apply(x, 1, quantile, c(0.4, 0.7))
+```
+
+## 3.1.7 Q4
+```{r}
+row_cumsum <- apply(x, 1, cumsum)
+row_cumsum
+```
+```{r}
+class(row_cumsum)
+```
+The first column is the cumulative sums of the first row.
+
+## 3.1.7 Q5
+```{r}
+b <- 1:4
+a <- c(1, 0, 0, 0)
+x %*% a == b
+```
+
+## 3.3.4 Q1
+```{r}
+animal <- rep(c("sheep", "pig"), c(3,3))
+weight <- c(110, NA, 140, NA, 300, 800)
+condition <- c("excellent", "good", NA, "excellent", "good", "average")
+healthy <- c(rep(TRUE, 5), FALSE)
+my_data_frame <- data.frame(animal, weight, condition, healthy)
+my_data_frame
+```
+```{r}
+my_data_frame_nona <- na.omit(my_data_frame)
+my_data_frame_nona
+```
+
+## 3.3.4 Q2
+```{r}
+my_data_frame[is.na(my_data_frame$weight), 'weight'] <- median(my_data_frame$weight, na.rm = T)
+my_data_frame
+```
+
+## 3.3.4 Q3
+```{r}
+my_data_frame <- rbind(my_data_frame, c('pig', 900, 'average', F))
+my_data_frame
+```
+
+## 3.3.4 Q4
+```{r}
+my_data_frame_sub <- my_data_frame[my_data_frame$weight < 400 & my_data_frame$condition %in% c('good', 'excellent'), c('animal', 'healthy')]
+my_data_frame_sub
+```
