@@ -40,18 +40,18 @@ x
 
 ## 3.1.7 Q2
 ```{r}
-x <- matrix(1:16, 4, 4)
-colMeans(x)
+X <- matrix(1:16, 4, 4) + diag(4)
+colMeans(X)
 ```
 
 ## 3.1.7 Q3
 ```{r}
-apply(x, 1, quantile, c(0.4, 0.7))
+apply(X, 1, quantile, c(0.4, 0.7))
 ```
 
 ## 3.1.7 Q4
 ```{r}
-row_cumsum <- apply(x, 1, cumsum)
+row_cumsum <- apply(X, 1, cumsum)
 row_cumsum
 ```
 ```{r}
@@ -62,8 +62,8 @@ The first column is the cumulative sums of the first row.
 ## 3.1.7 Q5
 ```{r}
 b <- 1:4
-a <- c(1, 0, 0, 0)
-x %*% a == b
+a <- solve(X) %*% b
+a
 ```
 
 ## 3.3.4 Q1
