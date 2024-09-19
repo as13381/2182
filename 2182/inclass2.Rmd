@@ -1,0 +1,176 @@
+---
+title: "In-class Assignment 2"
+author: "Andrew Shao"
+date: "2024-09-19"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2.4.4 Q1
+`mix_1` will be `"integer"` because it is the sum of two `"integer"`s (int_1 and int_2 have "L" at the end) so using the coercion rule the storage type will be of the most complex type which is `"integer"`.\
+`mix_2` will be `"double"` because it is the sum of an `"integer"` and a `"double"` (num_1 doesn't have the "L"), so the most complex type is `"double"` and we invoke the coercion rule like before.\
+`mix_3` will be `"double"` because it is the quotient of two `"integer"`s that isn't a whole number so it must be stored as a `"double"`.\
+`mix_4` will be `"character"` because it contains a `"double"` and a `"character"`, and `"character"` is the more complex type and we can invoke the coercion rule.\
+`mix_5` will be `"double"` because it contains a `"double"` and a `"logical"`, and `"double"` is the more complex and we invoke the coercion rule.\
+`mix_6` will be `"character"` because it contains a `"double"`, `"character"`, and `"logical"`, and `"character"` is the most complex of the three and we invoke the coercion rule.\
+
+```{r}
+int_1 <- 5L
+int_2 <- 6L
+num_1 <- 2
+char_1 <- "pig"
+logi_1 <- TRUE
+mix_1 <- int_1 + int_2 
+mix_2 <- int_1 + num_1
+mix_3 <- int_1/int_2
+mix_4 <- c(num_1, char_1)
+mix_5 <- c(num_1, logi_1)
+mix_6 <- c(num_1, char_1, logi_1)
+```
+```{r}
+typeof(mix_1)
+```
+```{r}
+typeof(mix_2)
+```
+```{r}
+typeof(mix_3)
+```
+```{r}
+typeof(mix_4)
+```
+```{r}
+typeof(mix_5)
+```
+```{r}
+typeof(mix_6)
+```
+
+## 2.4.4 Q2
+`3 * logi_2 + logi_3` will result in a vector of storage type `"double"` with values 4, 1, and 4.\
+`logi_2 - logi_3` will result in a vector of storage type `"double"` with values 0, -1, and 0.\
+This is because the logical vectors will be treated as vectors of 0's and 1's in math operations.
+
+## 2.5.3 Q1
+```{r}
+v1 <- c(7, 2, 4, 9, 7)
+v2 <- c(6, 2, 8, 7, 9)
+v3 <- 1:50
+c(1, 2, 3, 4, 5)[v1 < v2]
+```
+
+## 2.5.3 Q2
+```{r}
+v2[v1 > 5]
+```
+
+## 2.5.3 Q3
+```{r}
+v3[v3 %% 7 == 0]
+```
+
+## 2.5.3 Q4
+```{r}
+v3[v3 %% 8 == 0] <- 100
+v3
+```
+
+## 2.7.4 Q1
+```{r}
+exe <- c(2, 0, -3, 0, 5, 6)
+sort(exe, decreasing = T)
+```
+
+## 2.7.4 Q2
+```{r}
+rank(exe, ties.method = 'min')[exe %in% c(2, 0)]
+```
+
+## 2.7.4 Q3
+```{r}
+order(exe)
+```
+
+## 2.13.6 Q1
+```{r}
+v1 <- seq(from = 1, to = 100, by = 3)
+v2 <- sqrt(v1)
+v1s <- v1[v1 > 30 & v1 < 60]
+v1s
+```
+
+## 2.13.6 Q2
+```{r}
+v2[v1 < 20 | v1 > 50]
+```
+
+## 2.13.6 Q3
+```{r}
+a <- c(T, F, T, F)
+b <- c(T, T, F, F)
+xor(a, b) == (!a & b) | (a & !b)
+```
+
+## 2.15.3 Q1
+```{r}
+x <- rep(c(1, 2, NA), 3:5)
+```
+### a.
+```{r}
+summary(x)
+```
+```{r}
+min(x, na.rm = T)
+```
+```{r}
+quantile(x, 0.25, na.rm = T)
+```
+```{r}
+median(x, na.rm = T)
+```
+```{r}
+mean(x, na.rm = T)
+```
+```{r}
+quantile(x, 0.75, na.rm = T)
+```
+```{r}
+max(x, na.rm = T)
+```
+```{r}
+sum(is.na(x))
+```
+
+### b.
+```{r}
+which(is.na(x))
+```
+
+### c.
+```{r}
+x_no_na <- na.omit(x)
+x_no_na
+```
+
+### d.
+```{r}
+x[is.na(x)] <- median(x, na.rm = T)
+x
+```
+
+## 2.15.3 Q2 
+```{r}
+y <- rep(c("N", 2, "A"), 5:3)
+y[y %in% c('N', 'A')] <- NA
+y
+```
+```{r}
+which(is.na(y))
+```
