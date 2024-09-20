@@ -1,0 +1,49 @@
+---
+title: "Homework 1"
+author: "Andrew Shao (NetID: as13381)"
+output: pdf_document
+bibliography: references.bib
+nocite:
+  - '@*'
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Question 1 (0.5 pt): Generate the following code chunk.
+```{r}
+suppressMessages(library(tidyverse))
+library(dslabs)
+data(us_contagious_diseases)
+```
+
+## Question 2 (1 pt): Use the following R code to produce the following bar chart for the dataset `us_contagious_diseases`. Choose an appropriate chunk option to add the caption “`The number of observations for each disease`” to the figure.
+```{r, fig.cap='The number of observations for each disease'}
+ggplot(data = us_contagious_diseases) + geom_bar(mapping = aes(x = disease))
+```
+
+## Question 3 (1 pt): The R code `head(us_contagious_diseases)` outputs the first 6 rows of the dataset `us_contagious_diseases`. Use `knitr::kable` to make the following table for the output of `head(us_contagious_diseases)`, with the caption “`The first 6 rows of us_contagious_diseases`”. Choose an appropriate chunk option to hide the code chunk.
+```{r, tab.cap='The first 6 rows of us_contagious_diseases', echo=FALSE}
+knitr::kable(head(us_contagious_diseases), "pipe")
+```
+
+## Question 4 (0.5 pt): Write the following sentence and formula.
+Compute the rate by the following formula:
+\[rate = cout/poluation.\]
+
+## Question 5 (0.5 pt): Write the following sentence in which the numbers are produced by inline R code.
+The `us_contagious_diseases` data has `r nrow(us_contagious_diseases)` rows and `r ncol(us_contagious_diseases)` columns.
+
+## Question 6 (0.5 pt): Write the following sentence and include a hyperlink to the website address.
+The `us_contagious_diseases` data is available in the R package `dslabs` (https://rdrr.io/cran/dslabs/man/us_contagious_diseases.html).
+
+## Question 7 (1 pt): Write the following sentence. Cite the article and generate the reference list by using BibTex.
+Please cite the article Van Panhuis et al. (2013) for the dataset `us_contagious_diseases`.
+
+# References
