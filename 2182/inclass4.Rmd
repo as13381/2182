@@ -1,0 +1,59 @@
+---
+title: "In-class 4"
+author: "Andrew Shao"
+date: "2024-09-26"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 5.1.5 Q1
+```{r}
+library(r02pro)
+jpeg('data/sale_price_vs_liv_area.jpg')
+plot(sahp$liv_area, sahp$sale_price, xlab = 'living area', ylab = 'sale price', col = 'red')
+dev.off()
+```
+
+The two variables are positively correlated.
+
+## 5.1.5 Q2
+```{r}
+library(ggplot2)
+ggplot(data = gm2004) +
+  geom_point(mapping = aes(x = sanitation,
+                           y = life_expectancy))
+ggsave('data/life_expectancy_vs_sanitation.pdf')
+```
+Sanitation and life expectancy seem to be positively correlated.
+
+## 5.6.4 Q1
+```{r}
+ggplot(data = sahp) +
+  geom_smooth(mapping = aes(x = lot_area,
+                            y = sale_price))
+```
+
+## 5.6.4 Q2
+```{r}
+ggplot(data = sahp) +
+  geom_smooth(mapping = aes(x = lot_area,
+                            y = sale_price,
+                            color = kit_qual))
+```
+
+## 5.6.4 Q3
+```{r}
+ggplot(data = sahp) +
+  geom_smooth(mapping = aes(x = lot_area,
+                            y = sale_price,
+                            linetype = bedroom > 2),
+              se = F)
+```
+
