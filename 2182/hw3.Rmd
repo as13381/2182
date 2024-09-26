@@ -1,0 +1,27 @@
+---
+title: "Homework 3"
+author: "Andrew Shao"
+date: "2024-09-25"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2.16.3 Q1
+```{r}
+sum(!is.na(as.Date(paste0(1900:2021, '-02-29'), format = '%Y-%m-%d')))
+```
+
+## 2.16.3 Q2
+1
+```{r}
+x <- as.Date("69-01-01", format = "%y-%m-%d")
+y <- as.Date("68-12-31", format = "%y-%m-%d")
+x - y
+```
