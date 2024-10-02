@@ -1,0 +1,78 @@
+---
+title: "In-class Assignment 5"
+author: "Andrew Shao"
+date: "2024-10-02"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 5.8.5 Q1
+```{r}
+library(r02pro)
+library(ggplot2)
+ggplot(data = sahp) +
+  geom_bar(mapping = aes(x = gar_car))
+```
+
+## 5.8.5 Q2
+```{r}
+ggplot(data = sahp) +
+  geom_bar(mapping = aes(x = gar_car, fill = oa_qual > 5))
+```
+
+## 5.8.5 Q3
+```{r}
+ggplot(data = sahp) +
+  geom_bar(mapping = aes(x = gar_car, fill = oa_qual > 5),
+           position = 'dodge')
+```
+
+## 5.8.5 Q4
+```{r}
+tab <- table(sahp$gar_car)
+ggplot(data.frame(gar_car = names(tab),
+                  freq = as.vector(tab),
+                  prop = as.vector(tab / nrow(sahp))),
+       aes(x = '',
+           y = prop,
+           fill = gar_car)) +
+  geom_bar(stat = 'identity') +
+  geom_text(aes(label = round(100 * prop, 2)),
+            position = position_stack(vjust = 0.5)) +
+  coord_polar('y') +
+  theme_void()
+```
+
+## 5.9.5. Q1
+```{r}
+ggplot(sahp) +
+  geom_histogram(mapping = aes(x = liv_area),
+                 bins = 10)
+```
+```{r}
+ggplot(sahp) +
+  geom_histogram(mapping = aes(x = liv_area),
+                 binwidth = 300)
+```
+```{r}
+ggplot(sahp) +
+  geom_histogram(mapping = aes(x = liv_area),
+                 breaks = seq(0, 3500, 500))
+```
+
+## 5.9.5 Q2
+```{r}
+ggplot(sahp) +
+  geom_histogram(mapping = aes(x = liv_area,
+                               fill = kit_qual),
+                 bins = 5)
+```
+
+On houses with more living area have better kitchen quality (probably related to pricing).
