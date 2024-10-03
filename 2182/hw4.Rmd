@@ -60,6 +60,7 @@ ggplot(data = remove_missing(gm2004, vars = 'HDI_category')) +
                            size = population)) +
   scale_color_manual(values = c('low' = 'purple', 'medium' = 'purple', 'high' = 'red', 'very high' = 'red'))
 ```
+High HDI is associated with high cholesterol and sugar.
 
 ## 5.4.6 Q1
 ```{r}
