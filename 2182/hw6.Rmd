@@ -1,0 +1,103 @@
+---
+title: "HW6"
+author: "Andrew Shao"
+date: "2024-10-09"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 4.4.4 Q1
+```{r}
+df1 <- data.frame(word1 = c('one', 'two', NA), number1 = c(1, NA, 3))
+df1
+```
+```{r}
+df2 <- data.frame(word2 = c('three', NA, 'five'), number2 = c(3, 4, 5))
+df2
+```
+```{r}
+my_list = list(df1, df2)
+my_list
+```
+```{r}
+setwd("C:/Users/as345/OneDrive/Desktop")
+
+library(writexl)
+
+write_xlsx(my_list, 'list.xlsx')
+```
+There are two sheets in the file where the first sheet is the first element of `my_list`, or `df`, and the second element `df2` is on the second sheet.
+
+## 4.4.4 Q2
+```{r}
+library(readxl)
+
+setwd("C:/Users/as345/OneDrive/Desktop")
+
+hello <- read_excel('list.xlsx', sheet = 2, range = 'A1:A2')
+hello
+```
+
+## 4.5.5 Q1
+```{r}
+library(r02pro)
+library(haven)
+
+df <- sahp[1:8, ]
+
+write_sav(df, 'sahp8.sav')
+write_sas(df, 'sahp8.sas7bdat')
+write_dta(df, 'sahp8.dta')
+```
+
+## 4.5.5 Q2
+```{r}
+df_sav <- read_sav('sahp8.sav')
+df_sav
+```
+```{r}
+df_sas <- read_sas('sahp8.sas7bdat')
+df_sas
+```
+```{r}
+df_dta <- read_dta('sahp8.dta')
+df_dta
+```
+
+## 4.6.3 Q1
+```{r}
+my_vec <- 1:8
+my_list <- list(my_num = 5:10, my_char = letters[1:5])
+save(my_vec, my_list, file = 'my_vec_list.RData')
+rm(list = ls())
+ls()
+```
+```{r}
+load('my_vec_list.RData')
+my_vec
+```
+```{r}
+my_list
+```
+
+## 4.6.3 Q2
+```{r}
+saveRDS(list(my_vec = my_vec, my_list = my_list), 'my_vec_list.rds')
+rm(list = ls())
+ls()
+```
+```{r}
+my_vec <- readRDS('my_vec_list.rds')$my_vec
+my_vec
+```
+```{r}
+my_list <- readRDS('my_vec_list.rds')$my_list
+my_list
+```

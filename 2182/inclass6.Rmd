@@ -1,0 +1,62 @@
+---
+title: "In-class Assignment 6"
+author: "Andrew Shao"
+date: "2024-10-09"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 4.2.5 Q1
+```{r}
+my_data <- data.frame(word = c('one', 'two', NA, 'four', 'five'),
+                      number = c(1, NA, 3, 4, 5),
+                      letter = c('a', 'b', 'c', 'd', 'e'))
+```
+```{r}
+setwd("C:/Users/as345/2182/2182")
+if (!dir.exists('my_data')) {
+  dir.create("my_data")
+}
+
+library(readr)
+write_csv(my_data, 'my_data/my_data_no_name.csv', col_names = F)
+```
+
+## 4.2.5 Q2
+```{r}
+write_delim(my_data, 'my_data/my_data_na.csv', delim = '#', na = '999')
+```
+
+## 4.3.6 Q1
+```{r}
+my_data <- read_delim('my_data/my_data_na.csv', delim = '#', na = '999')
+my_data
+```
+
+## 4.3.6 Q2
+The column names should be `X1`, `X2`, and `X3`, because of the argument `col_names = FALSE` which tells the first row is not the column names and thus automatically assign default column names.
+```{r}
+d1 <- read_csv("x,y,z
+          1,3,5
+          2,4,6", col_names = FALSE)
+
+d1
+```
+
+## 4.3.6 Q3
+There will be only one column named `The first line` since R will assume the first line is the column names and since the default delimiter is `,` it will read the entire first line as just 1 string.
+```{r}
+d1 <- read_csv("The first line 
+          The second line
+          The third line
+          x,y,z
+          1,3,5")
+d1
+```
