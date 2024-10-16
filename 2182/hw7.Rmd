@@ -1,0 +1,102 @@
+---
+title: "HW7"
+author: "Andrew Shao"
+date: "2024-10-16"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 7.4.1 Q1
+```{r}
+library(r02pro)
+library(tidyverse)
+
+ahp %>%
+  mutate(age = yr_sold - yr_built) %>%
+  select(age, sale_price, kit_qual) %>%
+  ggplot() +
+  geom_point(aes(x = age,
+                 y = sale_price,
+                 color = kit_qual))
+```
+As age increases, sale price generally gets lower and the proportion of houses with higher kitchen quality goes down. Also price is generaly higher for houses with better kitchen quality.
+
+## 7.5.3 Q1
+```{r}
+ahp %>%
+  group_by(mo_sold) %>%
+  summarize(price_q1 = quantile(sale_price, 0.25, na.rm = T),
+            price_q3 = quantile(sale_price, 0.75, na.rm = T)) %>%
+  ggplot(aes(month.abb[mo_sold])) +
+  geom_point(aes(y = price_q1, color = 'Q1')) +
+  geom_point(aes(y = price_q3, color = 'Q3')) +
+  scale_x_discrete(limits = month.abb) +
+  xlab('month') +
+  ylab('price')
+```
+The first quartile doesn't vary much , but the third quartile peaks in January and September (School start times?) with the lowest in April.
+
+## 7.5.3 Q2
+```{r}
+ahp %>%
+  mutate(less_30yo = (yr_sold - yr_built) <= 30) %>%
+  remove_missing(vars = c('less_30yo', 'sale_price')) %>%
+  group_by(less_30yo) %>%
+  summarize(min_price = min(sale_price),
+            med_price = median(sale_price),
+            max_price = max(sale_price))
+```
+
+## 7.6.3 Q1
+```{r}
+ahp %>%
+  group_by(mo_sold) %>%
+  remove_missing(vars = c('mo_sold', 'sale_price')) %>%
+  mutate(higher_than_avg = sale_price > mean(sale_price)) %>%
+  ggplot() +
+  geom_point(aes(x = month.abb[mo_sold],
+                 y = sale_price,
+                 color = higher_than_avg)) +
+  scale_x_discrete(limits = month.abb) +
+  xlab('month') +
+  ylab('sale price')
+```
+There is more higher spread of prices in houses with higher than average prices. The average doesn't fluctuate very much.
+
+## 7.6.3 Q2
+```{r}
+ahp %>%
+  group_by(oa_cond) %>%
+  summarise(n = n(),
+            avg_sale_price = mean(sale_price, na.rm = T)) %>%
+  filter(n >= 30)
+```
+
+## 7.6.3 Q3
+```{r}
+ahp %>%
+  group_by(yr_remodel) %>%
+  mutate(r = rank(desc(sale_price), ties.method = 'first')) %>%
+  filter(r <= 2) %>%
+  select(yr_remodel, sale_price) %>%
+  arrange(yr_remodel, desc(sale_price))
+```
+
+## 7.6.3 Q4
+```{r}
+ahp %>%
+  group_by(kit_qual, central_air) %>%
+  mutate(r_asc = rank(sale_price, ties.method = 'first'),
+         r_desc = rank(desc(sale_price), ties.method = 'first'),
+         max_price = max(sale_price, na.rm = T)) %>%
+  filter(r_asc == 1 | r_desc == 1) %>%
+  arrange(desc(max_price), sale_price) %>%
+  select(!c(r_asc, r_desc, max_price))
+```
