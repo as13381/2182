@@ -1,0 +1,90 @@
+---
+title: "In-class Assignment 8"
+author: 'Hai Shu (NetID: hs120)'
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+### Question 1 (1 pt): Tidy the simple tibble below. Do you need to make it wider or longer? What are the variables?
+```{r Q1}
+preg <- tribble(
+  ~cancer, ~male, ~female,
+  "yes",     NA,    10,
+  "no",      20,    12
+)
+```
+#### Answer: 
+<!--Provide your answer, code and output below-->
+We need to make it longer; the two columns `male` and `female` should be made into a `gender` column. 
+```{r}
+preg %>%
+  pivot_longer(cols = c('male', 'female'), names_to = 'gender', values_to = 'count')
+```
+
+
+
+### Question 2 (1 pt): Both `unite()` and `separate()` have a `remove` argument. What does it do? Why would you set it to `FALSE`? Try the following code with this `remove` argument. In the following questions, `table3` to `table5` are available in the R package `tidyverse`.
+```{r Q2, eval=FALSE}
+table3 %>% separate(rate, into = c("cases", "population"))
+
+table5 %>% unite(new, century, year, sep = "")
+```
+#### Answer: 
+<!--Provide your answer, code and output below-->
+The `remove` argument drops the original input column(s), and is `TRUE` by default. You would set it to `FALSE` if you wanted to maintain the original input column(s).
+```{r}
+table3 %>% separate(rate, into = c('cases', 'population'), remove = F)
+table5 %>% unite(new, century, year, sep = "", remove = F)
+```
+
+
+### Question 3 (1 pt): Sometimes when a data source has primarily been used for data entry, missing values indicate that the previous value should be carried forward (see the 1^st^ chunk below). You can fill in these missing values with `fill()`. It takes a set of columns where you want missing values to be replaced by the most recent non-missing value (sometimes called last observation carried forward); see the 2^nd^ chunk below. The function `fill()` has a `.direction` argument. What does it do? Try the 2^nd^ chunk with different options of `.direction`.
+```{r Q3_1}
+treatment <- tribble(
+  ~ person,           ~ treatment, ~response,
+  "Derrick Whitmore", 1,           7,
+  NA,                 2,           10,
+  NA,                 3,           9,
+  "Katherine Burke",  1,           4
+)
+```
+```{r Q3_2}
+treatment %>% fill(person)
+```
+#### Answer: 
+<!--Provide your answer, code and output below-->
+The `.direction` argument indicates how the missing values will be filled. `down` means the missing values will be replaced by the last non-missing value above them, while `up` means they will be replaced by the first non-missing value below them. 
+```{r}
+treatment %>% fill(person, .direction = 'down')
+treatment %>% fill(person, .direction = 'up')
+treatment %>% fill(person, .direction = 'downup')
+treatment %>% fill(person, .direction = 'updown')
+```
+
+
+### Question 4 (1 pt): Create the data frame `table1_na` using the following code chunk. Use `replace_with_na_all()` in R package `naniar` to replace all non-standard missing values with `NA` in the data frame.
+```{r Q4}
+table1_na <- table1
+table1_na$cases <- as.character(table1_na$cases)
+table1_na$population <- as.character(table1_na$population)
+table1_na$cases[c(2,4,6)] <- c("N/A", "na", ".")
+table1_na$population[c(1,6)] <- c(NA, "--")
+table1_na
+```
+#### Answer: 
+<!--Provide your answer, code and output below-->
+```{r}
+library(naniar)
+
+table1_na %>% replace_with_na_all(~.x %in% c("N/A", "na", ".", '--'))
+```
+
+### Question 5 (1 pt): After the processing in Question 4, you may notice that the columns `cases` and `population` of `table1_na` are in the `character` type. Change the two columns into the `integer` type.
+#### Answer: 
+<!--Provide your answer, code and output below-->
+```{r}
+table1_na %>% mutate(across(cases:population, as.numeric))
+```
