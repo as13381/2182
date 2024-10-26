@@ -1,0 +1,312 @@
+
+---
+title: "Midterm Exam - Statistical Programming in R"
+author: "Andrew Shao (as13381)"
+date: "`r Sys.Date()`"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+# Question 1 (4 points): 
+
+You are analyzing air quality data across cities for public health research. The dataset `city_air_quality` consists of two vectors: city names and their corresponding Air Quality Index (AQI) values recorded over a week for five cities. The AQI for `CityD` is missing.
+
+```{r}
+city_names <- c("CityA", "CityB", "CityC", "CityD", "CityE")
+aqi_values <- c(70, 120, 95, NA, 45)
+```
+
+a) **Object Assignment and NA Handling:**  
+Assign `aqi_values` to a new object `clean_aqi`, replacing the missing value (`NA`) with the median of the remaining values. Then print the updated `clean_aqi`.
+
+b) **Logical Comparisons and Subsetting:**  
+Using logical operators, return the names of the cities where the AQI is either above 100 or below 50, in alphabetical order. Do this in a single line of code.
+
+c) **Vector Set Operations:**  
+Create a new vector `high_pollution_cities` for cities with AQI greater than 60, and `low_pollution_cities` for cities with AQI less than 80. Use a set operation to find which cities fall in both categories.
+
+d) **Statistical Summary:**  
+Calculate the following statistics for the `clean_aqi` vector:  
+   i) The standard deviation.
+   ii) The inter quartile range (IQR).
+
+
+## Answer:
+a)
+```{r}
+library(tidyverse)
+clean_aqi <- ifelse(is.na(aqi_values), median(aqi_values, na.rm = T), aqi_values)
+clean_aqi
+```
+
+b)
+```{r}
+sort(city_names[clean_aqi > 100 | clean_aqi < 50])
+```
+
+c)
+```{r}
+high_pollution_cities <- city_names[clean_aqi > 60]
+low_pollution_cities <- city_names[clean_aqi < 80]
+intersect(high_pollution_cities, low_pollution_cities)
+```
+
+d)
+```{r}
+sd(clean_aqi)
+IQR(clean_aqi)
+```
+
+# Question 2 (4 points): 
+
+You are working on patient health records to understand the relationship between age, gender, smoking habits, and cholesterol levels. The dataset `patients` contains information about patient demographics and health metrics.
+
+```{r message=FALSE}
+library(tidyverse)
+patients <- tibble(
+  ID = 1:5,
+  Age = c(34, 29, 45, 53, 41),
+  Gender = factor(c("Male", "Female", "Male", "Female", "Male")),
+  Smokes = factor(c("Yes", "No", "No", "Yes", "Yes")),
+  Cholesterol = c(190, 230, 180, NA, 220)
+)
+```
+
+a) **Handling Missing Values:**  
+Replace the missing `Cholesterol` value with the mean cholesterol of all smokers, ignoring the missing value. Assign this modified dataset to a new object called `updated_patients`.
+
+b) **Data Manipulation and Factor Levels:**  
+Change the factor levels of the `Smokes` column to "Non-smoker" and "Smoker". Recode the factor so that "Smoker" comes before "Non-smoker".
+
+c) **Advanced List Manipulation:**  
+Create a list `patient_summary` that contains the following elements, and print its contents. 
+   i) The `updated_patients` data frame.  
+   ii) A summary vector with the mean age, median cholesterol, and number of smokers.  
+   iii) A character vector that lists the patient IDs for males older than 40.
+
+
+## Answer:  
+a)
+```{r}
+updated_patients <- patients %>% mutate(Cholesterol = replace_na(Cholesterol, mean(Cholesterol, na.rm = T)))
+updated_patients
+```
+
+b)
+```{r}
+updated_patients <- updated_patients %>% mutate(Smokes = factor(Smokes, ordered = T, levels = c('Yes', 'No'), labels = c('Smoker', 'Non-smoker')))
+updated_patients$Smokes
+```
+
+c)
+```{r}
+patient_summary <- list(updated_patients,
+                        c(mean_age = mean(updated_patients$Age, na.rm = T),
+                          median_cholesterol = median(updated_patients$Cholesterol, na.rm = T),
+                          number_smokers = sum(updated_patients$Smokes == 'Smoker')),
+                        as.character(updated_patients$ID[updated_patients$Age > 40]))
+patient_summary
+```
+
+
+# Question 3 (4 points): 
+
+You are tasked with visualizing exercise data to examine its relationship with body mass index (BMI) and cholesterol levels. The dataset `exercise_data` contains weekly exercise hours, BMI, and cholesterol values for a group of individuals.
+
+```{r}
+exercise_data <- data.frame(
+  Hours_Exercise = c(5, 7, 3, 2, 8, 4, 6),
+  BMI = c(23.5, 25.2, 27.8, 31.1, 22.1, 29.6, 24.3),
+  Cholesterol = c(190, 220, 230, 240, 200, 250, 210)
+)
+```
+
+a) **Multiple Geometries and Custom Aesthetics:**  
+Create a scatterplot of `Hours_Exercise` vs `BMI` with `ggplot2`, save it as `my_plot` and display the plot. Add the following elements:  
+   i) Color points based on `Cholesterol` values, using a continuous color spectrum with green color for the low values and red color for the high values.  
+   ii) Distinguish between `BMI` values above 25 (overweight) and those not above 25 by altering the shape of the points.
+
+b) **Smoothline Fit and Local Mappings:**  
+Add a smooth line (`geom_smooth()`) to `my_plot` that fits a linear model, but apply this fit only to the individuals with a `BMI` greater than 25.
+
+c) **Customizing Axes and Titles:**  
+On top of the plot in b), customize the axes by adding meaningful labels, and add a title `"Exercise, BMI, and Cholesterol Relationship"`.
+
+d) **Facet and Complex Customization:**  
+Create a faceted plot where each facet represents the scatterplot of `Cholesterol` vs. `Hours_Exercise` for a BMI category ("Above 25" or "Not above 25").  
+
+## Answer:
+a)
+```{r}
+my_plot <- ggplot() +
+  geom_point(data = exercise_data,
+             aes(x = Hours_Exercise,
+                 y = BMI,
+                 color = Cholesterol,
+                 shape = BMI > 25)) +
+  scale_color_gradient(low = 'green', high = 'red')
+my_plot
+```
+b)
+```{r}
+my_plot_b <- my_plot +
+  geom_smooth(data = subset(exercise_data, BMI > 25),
+              aes(x = Hours_Exercise,
+                  y = BMI),
+              method = 'lm',
+              se = F)
+my_plot_b
+```
+
+c)
+```{r}
+my_plot_b +
+  ggtitle("Exercise, BMI, and Cholesterol Relationship") +
+  xlab('Hours Exercised') +
+  ylab('BMI')
+```
+d)
+```{r}
+ggplot(data = exercise_data %>% 
+         mutate(BMI_category = ifelse(BMI > 25, 'Above 25', 'Not above 25'))) +
+  geom_point(aes(x = Cholesterol,
+                 y = Hours_Exercise)) +
+  facet_wrap('BMI_category')
+```
+
+
+# Question 4 (4 points): 
+You are working with the `mtcars` dataset, and you are required to perform data manipulations and visualizations to gain insights. Note: load the data by the code `data(mtcars)`.
+
+a) **Data Manipulation:**
+* Filter the `mtcars` dataset to include only cars with `mpg` greater than the median `mpg` of the entire dataset.
+* Create a new column called `performance_score` which is calculated as the ratio of horsepower (`hp`) to weight (`wt`).
+* Create a new column called `performance_category` which categorizes cars based on their `performance_score` into three categories:
+  * `"High Performance"` for cars with a score greater than 60.
+  * `"Moderate Performance"` for cars with a score between 40 and 60.
+  * `"Low Performance"` for cars with a score less than 40.
+
+b) **Data Visualization:** 
+* Create a **density plot** to show the distribution of `performance_score` across different `cyl` (cylinders)  categories. Use different colors to represent  the density curves for each cylinder category.
+
+* Generate a **violin plot (with boxplot inside)** to compare the distribution of `mpg` across the `performance_category` categories. 
+Display `performance_category` 
+on the x-axis, arranging the categories from left to right in the order of `Low Performance`, `Moderate Performance`, and `High Performance`. 
+Fill the the violin plots with different colors for each `performance_category` category.
+
+c) **Data Aggregation:**
+* Group the filtered data by the `cyl` and `performance_category` categories and calculate the mean `mpg` and median `hp` for each group. Display the result as a dataframe or tibble.
+
+
+## Answer:
+a)
+```{r}
+data("mtcars")
+
+mtcars <- mtcars %>%
+  subset(mpg > median(mpg, na.rm = T)) %>%
+  mutate(performance_score = hp / wt,
+         performance_category = case_when(performance_score > 60 ~ 'High Performance',
+                                          performance_score < 40 ~ 'Low Performance',
+                                          .default = 'Moderate Performance'))
+head(mtcars)
+```
+
+b)
+```{r}
+ggplot(mtcars) +
+  geom_density(aes(x = performance_score,
+                   color = factor(cyl)))
+```
+
+c)
+```{r}
+mtcars %>%
+  group_by(cyl, performance_category) %>%
+  summarise(mean_mpg = mean(mpg, na.rm = T),
+            median_hp = median(hp, na.rm = T))
+```
+
+
+# Question 5 (4 points): 
+You are provided with two datasets:
+
+* `large_sales_data.txt`: A tab-delimited text file containing sales data with the columns `TransactionID`, `CustomerID`, `ProductID`, `SalesAmount`, `TransactionDate`.
+* `customer_info.json`: A JSON file containing customer information with fields: `CustomerID`, `Name`, `Age`, `Region`, and `LoyaltyScore`.
+
+a) **Data Import and Initial Transformation:**
+* Import the `large_sales_data.txt` file as a dataframe or tibble.
+* Import the `customer_info.json` file as a dataframe or tibble. Hint: google how to import a JSON file.
+* For the sales data:
+  * Convert the `TransactionDate` column into an appropriate date format. Hint: use the `as.Date()` function.
+  * Create a new column `TransactionMonth` which extracts the month from `TransactionDate`. Hint: use the `month()` function from the package `lubridate`.
+
+b) **Data Filtering:**
+* Filter the sales data to include only transactions where the `SalesAmount` is greater than 5000, and exclude transactions that occurred in the first quarter (January, February, March).
+Display the first 10 observations of the result
+with columns `TransactionID`, `SalesAmount`, `TransactionDate` and `TransactionMonth`.
+
+* Filter the customer data to include only customers who are at least 30 years old and have a `LoyaltyScore` of 8 or more.
+Display the first 7 observations of the result.
+
+c) **Data Analysis:**
+* In the filtered sales data, calculate the total number of transactions and the total `SalesAmount` for each month. Display the result as a dataframe or tibble.
+* In the filtered customer data, count how many customers belong to each region, and calculate the average `LoyaltyScore` for each region. Display the result as a dataframe or tibble.
+
+d) **Data Export:**
+* Export the filtered sales data 
+and the filtered customer data (from Sub-question (b)) as sheet `sales` and sheet `customers`
+into a single `.xlsx` file named `filtered_sales_customer_data.xlsx`.
+
+## Answer:
+a)
+```{r}
+# install.packages('jsonlite')
+library(jsonlite)
+
+large_sales_data <- read.table('large_sales_data.txt', header = T)
+customer_info <- jsonlite::fromJSON('customer_info.json')
+
+
+large_sales_data <- large_sales_data %>%
+  mutate(TransactionDate = as.Date(TransactionDate),
+         TransactionMonth = month(TransactionDate))
+
+head(large_sales_data)
+head(customer_info)
+```
+
+b)
+```{r}
+large_sales_data_filtered <- large_sales_data %>%
+  subset(SalesAmount > 5000 & TransactionMonth > 3)
+head(select(large_sales_data_filtered, `TransactionID`, `SalesAmount`, `TransactionDate`, `TransactionMonth`), 10)
+
+customer_info_filtered <- customer_info %>%
+  subset(Age >= 30 & LoyaltyScore >= 8)
+head(customer_info_filtered, 7)
+```
+
+c)
+```{r}
+large_sales_data_filtered %>%
+  group_by(TransactionMonth) %>%
+  summarize(transaction_total = n(),
+            total_sales = sum(SalesAmount))
+
+customer_info_filtered %>%
+  group_by(Region) %>%
+  summarize(customer_total = n(),
+            average_loyalty = mean(LoyaltyScore, na.rm = T))
+```
+
+d)
+```{r}
+# install.packages('writexl')
+library(writexl)
+
+write_xlsx(list(sales = large_sales_data_filtered, customers = customer_info_filtered), 'filtered_sales_customer_data.xlsx')
+```
