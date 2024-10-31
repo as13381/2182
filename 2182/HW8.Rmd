@@ -1,0 +1,79 @@
+---
+title: "Homework 8"
+author: 'Andrew Shao (NetID: as13381)'
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r load_packages, include=FALSE}
+library(tidyverse)
+```
+
+### You are required to process the data in the files `ProjectTycho_Level1_v1.0.0.csv` and `us_state_populations_ext.rds` via the 5 sequential steps given in the questions below. 
+
+### Question 1 (1 pt): Load the data from the file `ProjectTycho_Level1_v1.0.0.csv` and remove duplicate rows. Name the resulting data frame as `ProjectTycho_Level1`. Output the dimension of the data frame.
+#### Answer: 
+<!--Provide your code and output below-->
+```{r, warning=FALSE}
+ProjectTycho_Level1 <- distinct(read_csv('ProjectTycho_Level1_v1.0.0.csv', show_col_types = F))
+dim(ProjectTycho_Level1)
+```
+
+
+
+### Question 2 (1 pt): For data frame `ProjectTycho_Level1`, drop its rows that have `disease = "DIPHTHERIA"`. After that, output the distinct values of `ProjectTycho_Level1$disease`.
+#### Answer: 
+<!--Provide your code and output below-->
+```{r}
+ProjectTycho_Level1 <- filter(ProjectTycho_Level1, disease != 'DIPHTHERIA')
+unique(pull(ProjectTycho_Level1, disease))
+```
+
+
+
+### Question 3 (1 pt): Separate the column `epi_week` of `ProjectTycho_Level1` into two new columns named as `year` and `week` which are in the `integer` type. After that, provide the output of `head(ProjectTycho_Level1)` and `dim(ProjectTycho_Level1)`.
+#### Answer: 
+<!--Provide your code and output below-->
+```{r}
+ProjectTycho_Level1 <- ProjectTycho_Level1 %>%
+  mutate(year = epi_week %/% 100,
+         week = epi_week %% 100) %>%
+  select(-c('epi_week'))
+head(ProjectTycho_Level1)
+dim(ProjectTycho_Level1)
+```
+
+
+
+### Question 4 (1 pt): From `ProjectTycho_Level1`, create a new data frame, named as `ProjectTycho_count`, that contains the count of cases of each disease for each state at each year, with column names `disease`, `state`, `year`, `weeks_reporting` and `count`. Note that you first need to drop the rows with `cases = NA`. Use `ungroup()` if `group_by()` is used in your processing. You may see the data frame `us_contagious_diseases` of package `dslabs` as an example for the resulting data frame. Provide the output of `head(ProjectTycho_count)` and `dim(ProjectTycho_count)`.  
+#### Answer: 
+<!--Provide your code and output below-->
+```{r}
+ProjectTycho_count <- ProjectTycho_Level1 %>%
+  drop_na(cases) %>%
+  group_by(disease, loc, year) %>%
+  summarise(weeks_reporting = n(),
+            count = sum(cases)) %>%
+  ungroup() %>%
+  rename(state = loc)
+head(ProjectTycho_count)
+dim(ProjectTycho_count)
+```
+
+
+
+### Question 5 (1 pt): Load the data from the file `us_state_populations.rds`. Add the `population` information as a column to the data frame `ProjectTycho_count`. Note that the function `str_to_upper()` may be useful here. After that, provide the output of `head(ProjectTycho_count)` and `dim(ProjectTycho_count)`.  
+#### Answer: 
+<!--Provide your code and output below-->
+```{r}
+us_state_populations <- readRDS('us_state_populations.rds') %>% mutate(state = str_to_upper(state))
+
+ProjectTycho_count <- ProjectTycho_count %>%
+  left_join(us_state_populations, by = c('state', 'year'))
+head(ProjectTycho_count)
+dim(ProjectTycho_count)
+```
+

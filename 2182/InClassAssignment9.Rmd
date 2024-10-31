@@ -1,0 +1,79 @@
+---
+title: "In-class Assignment 9"
+author: 'Andrew Shao (NetID: as13381)'
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+### For Questions 1-5, we consider the relational data from the R package `nycflights13`.
+```{r, include=FALSE}
+library(tidyverse)
+library(nycflights13)
+```
+
+### Question 1 (1 pt): Add the locations (i.e. the `lat` and `lon`) of the origin and destination to `flights`.
+#### Answer: 
+<!--Provide your answer and code below-->
+```{r}
+flights %>% 
+  left_join(select(airports, faa, lat, lon), by = c('origin' = 'faa')) %>%
+  rename_with(~paste0('origin_', .x), all_of(c('lat', 'lon'))) %>%
+  left_join(select(airports, faa, lat, lon), by = c('dest' = 'faa')) %>%
+  rename_with(~paste0('dest_', .x), all_of(c('lat', 'lon')))
+```
+
+
+
+### Question 2 (1 pt): Filter `flights` to only show flights with planes that have flown at least 100 flights.
+#### Answer: 
+<!--Provide your answer and code below-->
+```{r}
+flights %>% semi_join(flights %>% 
+                        group_by(tailnum) %>% 
+                        summarise(nflights = n()) %>% 
+                        filter(nflights >= 100),
+                      by = 'tailnum')
+```
+
+
+
+### Question 3 (1 pt): What does `anti_join(flights, airports, by = c("dest" = "faa"))` tell you? What does `anti_join(airports, flights, by = c("faa" = "dest"))` tell you?
+#### Answer: 
+<!--Provide your answer and code below-->
+`anti_join(flights, airports, by = c("dest" = "faa"))` shows the flights whose destination is at an airport that is not included in the `airports` table. \
+`anti_join(airports, flights, by = c("faa" = "dest"))` shows the airports in `airports` which there are no flights in the `flights` table that have them as destinations.
+```{r}
+anti_join(flights, airports, by = c("dest" = "faa"))
+anti_join(airports, flights, by = c("faa" = "dest"))
+```
+
+
+
+### Question 4 (1 pt): Draw a plot for the average of departure-delay hours (`flights$dep_delay`) vs. the precipitation amount (`weather$precip`). 
+#### Answer: 
+<!--Provide your answer and code below-->
+```{r}
+flights %>%
+  group_by(year, month, day, hour, origin) %>%
+  summarise(avg_delay = mean(dep_delay, na.rm = T)) %>%
+  inner_join(weather, by = c('year', 'month', 'day', 'hour', 'origin')) %>%
+  ggplot() +
+  geom_point(aes(x = avg_delay, y = precip))
+```
+
+
+
+### Question 5 (1 pt): Create data frames `flight1` and `flight2` using the following code. How many unique observations do these two data frames contain in total?
+```{r Q5}
+flights_daily <- flights%>%select(year:day, origin, dest)
+flight1 <- flights_daily[1:1e5,]
+flight2 <- flights_daily[5e4:2e5,]
+```
+#### Answer: 
+<!--Provide your answer and code below-->
+```{r}
+nrow(union(flight1, flight2))
+```
