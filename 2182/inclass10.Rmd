@@ -1,0 +1,51 @@
+---
+title: "In-class Assignment 10"
+author: "Andrew Shao"
+date: "2024-11-06"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+df_a <- tibble(id = c(1, 2, 3), value = c("X", "Y", "Z"))
+df_b <- tibble(id = c(2, 3, 4), value = c("Y", "Z", "W"))
+```
+
+## 7.8.8 Q1
+```{r}
+intersect(df_a, df_b)
+```
+
+## 7.8.8 Q2
+```{r}
+union(df_a, df_b)
+union_all(df_a, df_b)
+```
+`union_all` includes duplicate rows while `union` doesn't.
+
+## 7.8.8 Q3
+```{r}
+setdiff(df_a, df_b)
+setdiff(df_b, df_a)
+```
+
+## 7.8.8 Q4
+```{r}
+union(setdiff(df_a, intersect(df_a, df_b)), setdiff(df_b, intersect(df_a, df_b)))
+symdiff(df_a, df_b)
+```
+
+## 7.8.8 Q5
+```{r}
+df_c <- tibble(id = c('a', 'b', 'c'), value = c(1, 2, 3))
+df_d <- tibble(id = c('c', 'a', 'b'), value = c(3, 1, 2))
+setequal(df_c, df_d)
+```

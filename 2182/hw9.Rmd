@@ -1,0 +1,106 @@
+---
+title: "HW9"
+author: "Andrew Shao"
+date: "2024-11-06"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(r02pro)
+d1 <- ahp %>%
+    select(dt_sold, bsmt_area, bsmt_ht) %>%
+    head(n = 5)
+d2 <- tibble(bsmt_ht = c("Excellent", "Good", "Average", "Poor"), height = c("100+ inches",
+    "90-99 inches", "80-89 inches", "<70 inches"))
+d1
+#> # A tibble: 5 × 3
+#>   dt_sold    bsmt_area bsmt_ht
+#>   <date>         <dbl> <chr>  
+#> 1 2010-03-25       725 Average
+#> 2 2009-04-10       913 Good   
+#> 3 2010-01-15      1057 Average
+#> 4 2010-04-19       384 Good   
+#> 5 2010-03-22       676 Fair
+d2
+#> # A tibble: 4 × 2
+#>   bsmt_ht   height      
+#>   <chr>     <chr>       
+#> 1 Excellent 100+ inches 
+#> 2 Good      90-99 inches
+#> 3 Average   80-89 inches
+#> 4 Poor      <70 inches
+```
+
+## 7.7.7 Q1
+```{r}
+inner_join(d1, d2, by = 'bsmt_ht')
+```
+Only rows with matching keys in `d1` and `d2` are retained. All columns from `d1` and `d2` are retained.
+
+## 7.7.7 Q2
+```{r}
+left_join(d1, d2, by = 'bsmt_ht')
+```
+All rows from `d1` are retained and all rows from `d2` with matching keys in `d1` are retained. All columns from `d1` and `d2` are retained.
+
+## 7.7.7 Q3
+```{r}
+right_join(d1, d2, by = 'bsmt_ht')
+```
+All rows from `d2` are retained and all rows from `d1` with matching keys in `d2` are retained. All columns from `d1` and `d2` are retained.
+
+## 7.7.7 Q4
+```{r}
+full_join(d1, d2, by = 'bsmt_ht')
+```
+All rows from `d1` and `d2` are retained, with `NA` filling in all the values when there is no matching key to join on. All columns from `d1` and `d2` are retained.
+
+## 7.7.7 Q5
+```{r}
+semi_join(d1, d2, by = 'bsmt_ht')
+```
+The rows with `bsmt_ht` value of `'Good'` or `'Average'` are retained since they show up in both `d1` and `d2`. Only the columns from `d1` are retained.
+
+## 7.7.7 Q6
+```{r}
+anti_join(d1, d2, by = 'bsmt_ht')
+```
+Only the last row in `d1` is retained since the key value of `'Fair'` is the only one that shows up in `d1` but not `d2`, which is the criteria for inclusion. Only the columns from `d1` are retained.
+
+## 7.7.7 Q7
+```{r}
+d2_new <- d2 %>% mutate(height_code = factor(d2$bsmt_ht, levels = c('Excellent', 'Good', 'Average', 'Poor'), labels = c(1, 2, 3, 4)))
+inner_join(d1, d2_new, by = 'bsmt_ht')
+```
+The new `height_code` column shows up in the results.
+
+## 7.7.7 Q8
+```{r}
+d1_filter <- d1 %>% filter(bsmt_area > 600 & bsmt_area < 800)
+inner_join(d1_filter, d2, by = 'bsmt_ht')
+```
+1 row comes from `d2`.
+
+## 7.7.7 Q9
+```{r}
+d1_na <- tibble(d1)
+d1_na[1, 'bsmt_ht'] = NA
+full_join(d1_na, d2, by = 'bsmt_ht')
+```
+The missing value causes the first row to not be joined with any row from `d2` so its `height` value is `NA`.
+
+## 7.7.7 Q10
+```{r}
+d2 <- rbind(d2, c('Very Good', '95-99 inches'))
+anti_join(d1, d2, by = 'bsmt_ht')
+```
+The rows in `d1` which don't have matching key values in `d2` are retained. Since the only `bsmt_ht` value which isn't in `d2` is `'Fair'` its row is the only one that is retained. Adding the last row to `d2` doesn't affect the result because its `bsmt_ht` value doesn't show up in `d1`.

@@ -39,9 +39,7 @@ unique(pull(ProjectTycho_Level1, disease))
 <!--Provide your code and output below-->
 ```{r}
 ProjectTycho_Level1 <- ProjectTycho_Level1 %>%
-  mutate(year = epi_week %/% 100,
-         week = epi_week %% 100) %>%
-  select(-c('epi_week'))
+  separate(epi_week, c('year', 'week'), sep = 4, convert = T)
 head(ProjectTycho_Level1)
 dim(ProjectTycho_Level1)
 ```
