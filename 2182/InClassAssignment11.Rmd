@@ -1,0 +1,49 @@
+---
+title: "In-class Assignment 11"
+author: 'Andrew Shao (NetID: as13381)'
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(stringr)
+```
+
+### Question 1 (1 pt): Use `str_length()` and `str_sub()` to extract the middle character from each string in the vector `x <- c("a", "abc", "abcd", "abcde", "abcdef")`. What will you do if a string has an even number of characters? (Hint: Base R function `floor()` or `ceiling()` may be useful here.)
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+x <- c("a", "abc", "abcd", "abcde", "abcdef")
+
+str_sub(x, ceiling(str_length(x) / 2), ceiling(str_length(x) / 2))
+```
+
+### Question 2 (1 pt): `words` is a vector with each element being a word, which is available after you run `library(tidyverse)`. From the vector `words`, find the words that have the highest number of vowels?
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+words[sapply(str_extract_all(words, '[aeiou]'), length) == max(sapply(str_extract_all(words, '[aeiou]'), length))]
+```
+### Question 3 (1 pt): `sentences` is a vector with each element being a sentence, which is available after you run `library(tidyverse)`. Extract the first word from each sentence in `sentences`. Use `%>% head(100)` to output the result. 
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+str_split(sentences, ' ', simplify = T)[,1] %>% head(100)
+```
+### Question 4 (1 pt): In the vector `sentences`, find all words that contain an apostrophe. In each found word, separate out the pieces before and after the apostrophe. (Hint: See 14.4.3 Grouped Matches in the textbook.)
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+str_split(sentences, ' ', simplify = T)[str_split(sentences, ' ', simplify = T) %>% str_detect('\'')] %>%
+  str_split('\'', simplify = T)
+```
+### Question 5 (1 pt): What are the five most common words in the vector `sentences`? (Hint: You may use `boundary("word")` with an appropriate function. Use the function `unlist()` to convert a list to a vector. The function `count()` may be useful here.)
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+sort(table(str_to_lower(unlist(str_split(sentences, boundary('word'))))), decreasing = T)[1:5]
+```
