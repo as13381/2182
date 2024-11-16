@@ -1,0 +1,74 @@
+---
+title: "HW10"
+author: "Andrew Shao"
+date: "2024-11-15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 9.1.3 Q1
+```{r}
+library(tidyverse)
+library(readr)
+fruits <- c('apple', 'banana', 'cherry')
+str_c(fruits, collapse = ' & ')
+```
+
+## 9.1.3 Q2
+```{r}
+colors <- c('red', 'green', 'blue', 'yellow', 'purple')
+str_sub(colors, 2, 4)
+```
+
+## 9.1.3 Q3
+```{r}
+animals <- c('cat', 'dog', 'elephant', 'giraffe')
+str_sub(animals, 2, 4) <- c('at', 'og', 'leph', 'iraf')
+animals
+```
+
+## 9.2.5 Q1
+```{r}
+fruits <- c("apple", "banana", "strawberry", "blueberry", "blackberry")
+str_view(fruits, 'an')
+```
+
+## 9.2.5 Q2
+```{r}
+str_view(fruits, '.e')
+```
+
+## 9.2.5 Q3
+```{r}
+str_view(fruits, 'berry$')
+```
+
+## 9.2.5 Q4
+```{r}
+codes <- c("A123", "B456", "Bb56", "C789", "D012", "e345")
+str_view(codes, '[A-Z]\\d')
+```
+
+## 9.2.5 Q5
+```{r}
+phone_numbers <- c("555-123-4567", "(555) 123 4567", "5551234567", "1-555-123-4567", "555.123.4567")
+str_view(phone_numbers, '\\d{3}-\\d{3}-\\d{4}')
+str_view(phone_numbers, '^\\(\\d{3}\\)')
+```
+
+## 9.2.5 Q6
+```{r}
+emails <- c("user.name@domain.com", "user123@domain.com", "user_name@domain.com",
+    "username@domaincom", "username@domain.net", "user@name@domain.com", "@icloud.com",
+    "user@.com", "user@do_main.com")
+str_detect(emails, "^[a-zA-Z0-9._]+@[a-zA-Z0-9]+\\.com$")
+```
+
+## 9.2.6 Q7
+```{r}
+dates <- c("2021-01-01", "12-31-2021", "2022-28-02", "2022-02-29", "2022-03-01")
+str_view(dates, '\\d{4}-(0\\d|1[0-2])-\\d{2}')
+```
