@@ -1,0 +1,37 @@
+---
+title: "Homework 11"
+author: 'Hai Shu (NetID: hs120)'
+output: pdf_document
+---
+
+```{r load_packages, include=FALSE}
+library(tidyverse)
+library(dslabs)
+```
+
+**You are required to process the data `us_contagious_diseases` (available from package `dslabs`) via the 5 sequential steps given in the questions below.**
+
+### Question 1 (1 pt): `state.name` and `state.region` are R built-in vectors that give the full names of the 50 US states and their corresponding geographic regions (Northeast, South, North Central, West), respectively. Note that all data are arranged according to alphabetical order of the state names. Create a list of 4 atomic vectors, named as `region_state`, where each atomic vector represents one geographic region, is labeled with the region name, and contains the names of all the region's states. Output the structure of the list `region_state`. Your output should look like as follows:
+![](HW11_Q1.png) 
+
+**Answer:** 
+
+
+
+### Question 2 (1 pt): Add `"District Of Columbia"` into the element `South` of the list `region_state` you created in Question 1. Output the structure of the new `region_state` list. 
+**Answer:** 
+
+
+
+### Question 3 (1 pt): From the data `us_contagious_diseases` of package `dslabs`, ignoring the variable `weeks_reporting`, compute the yearly incidence rate of each disease for each of the 4 geographic regions (Northeast, South, North Central, West). Store the result into a new data frame, named as `region_incidence`, with columns `disease`, `region`, `year`, and `incidence_per_millon` (i.e., the yearly incidence rate times one million). Provide the output of `head(region_incidence)` and `dim(region_incidence)`. Note that you need to drop the missing values (`NA`) of `us_contagious_diseases` after deleting the variable `weeks_reporting`. 
+**Answer:** 
+
+
+
+### Question 4 (1 pt): In the data frame `region_incidence`, choose an appropriate `str_` function to add the suffix `_US` to the values in the column `region`. Make sure that the resulting column `region` is a factor with levels in the order: `North_Central_US`, `Northeast_US`, `South_US`, `West_US`. Provide the output of `head(region_incidence)` and `levels(region_incidence$region)`.
+**Answer:** 
+
+
+
+### Question 5 (1 pt): From `region_incidence`, use `ggplot` to provide a line graph that shows the trend of the yearly incidence of disease `Hepatitis A` for all the 4 geographic regions. You need to appropriately reorder the factor levels of `region` to make the graph easier to read with the legend. What is your reordering of the `region`'s factor levels and why does it enhance the readability of your graph?
+**Answer:** 
