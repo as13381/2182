@@ -1,0 +1,84 @@
+---
+title: "In-class Assignment 13"
+author: "Andrew Shao"
+date: "2024-11-27"
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 11.2.6 Q1
+```{r}
+n <- 5
+output <- 1
+for (i in 1:n) {
+  output <- output * i
+}
+paste0('The factorial of ', n, ' is ', output, '.')
+```
+
+## 11.2.6 Q2
+```{r}
+n <- 10
+output <- 0
+for (i in 1:n) {
+  output <- output + i
+}
+paste0("The sum of numbers from 1 to ", n, " is ", output, ".")
+```
+
+## 11.2.6 Q3
+```{r}
+x <- 7
+for (i in 1:10) {
+  cat(paste(x, 'x', i, '=', x * i, '\n'))
+}
+```
+
+## 11.2.6 Q4
+```{r}
+n <- 13
+is_prime <- T
+for (i in 2:ceiling(sqrt(n))) {
+   for (j in i:n) {
+     if (i * j == n) {
+       is_prime <- F
+       break
+     }
+     if (i * j > n) {
+       break
+     }
+   }
+}
+paste(n, ifelse(is_prime, 'is a prime number.', 'is not a prime number.'))
+```
+
+## 11.3.4 Q1
+```{r}
+n <- 5
+output <- c()
+while(n > 0) {
+  output <- c(output, n)
+  n = n - 1
+}
+cat(paste(output, collapse = '\n'), '\nBlast off!')
+```
+
+## 11.3.4 Q2
+```{r}
+threshold <- 15
+i <- 1
+sum <- 0
+while(sum <= threshold) {
+  sum = sum + i
+  i = i + 1
+}
+i = i - 1
+paste0('The sum is ', sum, '. The last number added is ', i, '.')
+```
