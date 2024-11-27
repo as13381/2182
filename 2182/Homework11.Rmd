@@ -1,6 +1,6 @@
 ---
 title: "Homework 11"
-author: 'Hai Shu (NetID: hs120)'
+author: 'Andrew Shao (NetID: as13381)'
 output: pdf_document
 ---
 
@@ -15,9 +15,10 @@ library(dslabs)
 ![](HW11_Q1.png) 
 
 **Answer:** 
-
-
-
+```{r}
+library(dslabs)
+region_state <- list()
+```
 ### Question 2 (1 pt): Add `"District Of Columbia"` into the element `South` of the list `region_state` you created in Question 1. Output the structure of the new `region_state` list. 
 **Answer:** 
 
