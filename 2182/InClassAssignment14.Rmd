@@ -1,0 +1,44 @@
+---
+title: "In-class Assignment 14"
+author: 'Andrew Shao (NetID: as13381)'
+output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+### Question 1 (5 pt): Conduct the same simulation as that on page 22 of `Lesson14_lecture.pdf` except that the Poisson distribution is replaced by the continuous uniform distribution `Unif(0,10)`. Provide the plot similar to that on page 8 of `Lesson14_lecture.pdf`. (Hint: See the similar code in `Lesson14.R`.) 
+**Answer:** 
+```{r}
+library(stringr)
+
+set.seed(0)
+a <- 0
+b <- 10
+mu <- 5 # mean
+sigma <- sqrt(((b - a) ** 2) / 12) # standard deviation
+m <- 10000
+n <- c(5, 10, 25, 100, 1000, 10000)
+Z <- vector("list", length(n))
+names(Z) <- as.character(n)
+for(i in seq_along(n)){
+  n_i_str <- as.character(n[i])
+  for(j in 1:m){
+    X <- runif(n[i], a, b)
+    Z[[n_i_str]][j] <- (mean(X) - mu)/(sigma/sqrt(n[i]))
+  }
+}
+str(Z)
+
+z <- seq(-4, 4, length.out = 10000)
+Z$SN <- dnorm(z) # gives the standard normal probability density function (pdf) values of z
+str(Z)
+
+par(mfrow=c(2,3))
+for(n_i in n){
+  n_i_str <- as.character(n_i)
+  hist(Z[[n_i_str]], breaks=50, prob = TRUE, xlab="Z",
+       main = str_c("Histogram of n=",n_i_str))
+  lines(z, Z$SN, col="blue", lwd=2)
+}
+```

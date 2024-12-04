@@ -1,0 +1,40 @@
+---
+title: "Homework 12"
+author: 'Andrew Shao (NetID: as13381)'
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(nycflights13)
+```
+
+### Question 1 (1 pt): Write a `for` loop to determine the type of each column in the data frame `flights` of package `nycflights13`.
+**Answer:** 
+```{r}
+library(nycflights13)
+
+col_types <- c()
+for (i in colnames(flights)) {
+  col_types <- c(col_types, typeof(flights[[i]]))
+}
+col_types
+```
+### Question 2 (1 pt): Write code that uses one of the `map` functions to determine the type of each column in the data frame `flights` of package `nycflights13`.
+**Answer:** 
+```{r}
+library(purrr)
+map(flights, typeof)
+```
+### Question 3 (2 pts): What does `map_dbl(-2:2, rnorm, n = 5)` do? Why? (If there is an error when knitting, use the code chunk option `error = TRUE`.)
+**Answer:** 
+It returns an error, because the `rnorm` function calls return vectors of length greater than 1 and which causes an error because the vector returned must be of length 1.
+```{r, error=TRUE}
+map_dbl(-2:2, rnorm, n = 5)
+```
+### Question 4 (1 pt): Use the `pmap` function to generate 2, 3, and 5 random numbers from the continuous uniform distributions `Unif(0,1)`, `Unif(10,100)`, and `Unif(100,1000)`, respectively. Don't forget to set the random number seed by `set.seed(0)`.
+**Answer:** 
+```{r}
+set.seed(0)
+pmap(list(c(2, 3, 5), c(0, 10, 100), c(1, 100, 1000)), runif)
+```
