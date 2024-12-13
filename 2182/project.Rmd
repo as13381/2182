@@ -25,19 +25,20 @@ counties <- read_csv('us-counties-all.csv')
 
 ## Exploratory Data Analysis
 ```{r}
-ggplot(data = US, aes(x = date)) +
-  geom_line(mapping = aes(y = cases), color = 'blue')
-ggplot(data = US, aes(x = date)) +
-  geom_line(mapping = aes(y = deaths), color = 'red')
 
-cases_delta <- rbind(0, US[2:nrow(US), 'cases'] - US[1:nrow(US)-1, 'cases'])
-deaths_delta <- rbind(0, US[2:nrow(US), 'deaths'] - US[1:nrow(US)-1, 'deaths'])
-US_delta <- US %>% cbind(c(cases_delta, deaths_delta))
-
-ggplot(data = US_delta, aes(x = date)) +
-  geom_line(mapping = aes(y = cases.1), color = 'blue')
-ggplot(data = US_delta, aes(x = date)) +
-  geom_line(mapping = aes(y = deaths.1), color = 'red')
+# ggplot(data = US, aes(x = date)) +
+#   geom_line(mapping = aes(y = cases), color = 'blue')
+# ggplot(data = US, aes(x = date)) +
+#   geom_line(mapping = aes(y = deaths), color = 'red')
+# 
+# cases_delta <- rbind(0, US[2:nrow(US), 'cases'] - US[1:nrow(US)-1, 'cases'])
+# deaths_delta <- rbind(0, US[2:nrow(US), 'deaths'] - US[1:nrow(US)-1, 'deaths'])
+# US_delta <- US %>% cbind(c(cases_delta, deaths_delta))
+# 
+# ggplot(data = US_delta, aes(x = date)) +
+#   geom_line(mapping = aes(y = cases.1), color = 'blue')
+# ggplot(data = US_delta, aes(x = date)) +
+#   geom_line(mapping = aes(y = deaths.1), color = 'red')
 
 ```
 
