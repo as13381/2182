@@ -3,6 +3,10 @@ title: "Project"
 author: "Andrew Shao"
 date: "2024-11-13"
 output: pdf_document
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 ---
 
 ```{r setup, include=FALSE}
@@ -10,36 +14,387 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Introduction
+The COVID-19 pandemic has had profound impacts on public health and policymaking across the United States. Understanding the dynamics of case and death rates is critical for designing effective interventions. This analysis investigates how varying temporal resolutions (daily, weekly, and monthly) and geographical scales (county, state, and national levels) influence the interpretation of COVID-19 data. By comparing these dimensions, this study aims to uncover patterns that may remain hidden when data is aggregated differently, thereby providing insights into the optimal levels of granularity for monitoring and response planning.
+
+To address this problem, datasets from The New York Times GitHub repository will be utilized, specifically focusing on national, state, and county-level COVID-19 data. The analysis will involve data cleaning, aggregation, and visualization to explore the interplay between timeframes and geographical granularity. The findings aim to guide researchers and policymakers in tailoring their analytical approaches to the complexity of public health data, ultimately supporting informed decision-making during public health crises.
 
 ## Packages Required
-```{r}
+For this analysis I used the following packages: `tidyverse`, `USAboundaries`, `lubridate`, and `knitr`. I used several packages included in `tidyverse` including `dplyr`, `tibble`, and `tidyr` to organize and clean the data and `ggplot2` to draw plots. Additionally, the county data in the package `USAboundaries` was used to verify the names of the counties within the New York Times datasets. `lubridate` was used to manipulate the dates within the data for temporal analysis.
+```{r, message=FALSE, warning=FALSE}
+# install.packages('remotes')
+# remotes::install_github("ropensci/USAboundaries")
+# install.packages("USAboundariesData", repos = "https://ropensci.r-universe.dev", type = "source")
+
 library(tidyverse)
+library(USAboundaries)
+library(lubridate)
 ```
 
 ## Data Preparation
+[The dataset used in this analysis originates from The New York Times' COVID-19 Data Repository](https://github.com/nytimes/covid-19-data?tab=readme-ov-file#geographic-exceptions), which was created to provide a comprehensive and up-to-date record of COVID-19 cases and deaths across the United States. The data spans from the onset of the pandemic in early 2020 through March 23, 2023, and is regularly updated to reflect cumulative statistics. It includes three main datasets representing different geographical scales: national, state, and county levels. Each dataset contains variables such as date, geographical location (e.g., state or county names), cumulative case counts, and cumulative death counts. Notably, the data captures daily updates, allowing for temporal aggregation into weekly or monthly intervals. Missing values are recorded as blanks or "Unknown", and no explicit imputation has been performed within the raw datasets. Users of the data must account for these gaps during analysis, as they may reflect unreported cases or delays in data collection. Additionally, the county-level dataset integrates information from multiple files to provide a consistent and unified view, potentially introducing discrepancies that should be carefully addressed during preprocessing. Overall, this dataset serves as a valuable resource for tracking the trajectory of the pandemic and analyzing its impacts across various levels of granularity.
 ```{r}
-US <- read_csv('us.csv')
-states <- read_csv('us-states.csv')
-counties <- read_csv('us-counties-all.csv')
+US <- read_csv('us.csv', show_col_types = F)
+states <- read_csv('us-states.csv', show_col_types = F)
+counties <- read_csv('us-counties-all.csv', show_col_types = F)
+```
+The national and state level data files had no missing values while the county level data file had 35,156 missing values for the county `fips` variable, which is a code for geographical regions used by the Federal Communications Commission, and 82,097 missing values within the `deaths` variable.
+```{r}
+# Missing values
+colSums(is.na(US))
+colSums(is.na(states))
+colSums(is.na(counties))
+
+# Missing values in deaths
+na_deaths <- counties %>% filter(is.na(deaths))
+head(na_deaths)
+unique(na_deaths$state)
+```
+To check the `county` variable values for missing values potentially marked by values such as "Unknown", I compared the `county` values with the list of county names contained within the `USAboundaries` package. Besides "Unknown" values there were "Pending County Assignment" values which were interestingly only in Texas.
+```{r}
+# Extract list of county names using USAboundaries package
+county_names <- us_counties()
+county_names <- county_names$name
+
+unique(counties$county[!(counties$county %in% county_names)])
+```
+```{r}
+unknown_counties <- counties %>% filter(county  == 'Unknown')
+pending_county <- counties %>% filter(county == 'Pending County Assignment')
+
+# Dataframe of rows with "Unknown" county value
+head(unknown_counties)
+dim(unknown_counties)
+
+# Dataframe of rows with "Pending County Assignment" county value
+head(pending_county)
+dim(pending_county)
+```
+Additionally, all counties in Puerto Rico lacked death data as deaths were only tracked on the state-level within this dataset. All of the missing values in `deaths` were accounted for by this fact.
+```{r}
+PR_counties <- counties %>% filter(state == 'Puerto Rico')
+head(PR_counties)
+dim(PR_counties)
+
+# Puerto Rico county data
+dim(intersect(PR_counties, unknown_counties))
+colSums(is.na(intersect(PR_counties, unknown_counties)))
+
+dim(setdiff(PR_counties, unknown_counties))
+colSums(is.na(setdiff(PR_counties, unknown_counties)))
+```
+Ultimately to tidy the data I decided to exclude all "Unknown" and "Pending County Assignment" observations as these were ambiguous to the actual location of residence of those individuals. By excluding those rows, this also eliminated all missing values from the data. I also split each dataset into smaller tibbles for each geographic scale and metric (i.e. death vs case count).
+```{r}
+county_cases <- counties %>%
+  select(date, county, state, cases) %>%
+  filter(county != 'Unknown' & county != 'Pending County Assignment')
+# colSums(is.na(county_cases))
+
+county_deaths <- counties %>%
+  select(date, county, state, deaths) %>%
+  drop_na() %>%
+  filter(county != 'Unknown' & county != 'Pending County Assignment')
+# colSums(is.na(county_deaths))
+
+state_cases <- states %>% select(date, state, cases)
+
+state_deaths <- states %>% select(date, state, deaths)
+
+US_cases <- US %>% select(-deaths)
+
+US_deaths <- US %>% select(-cases)
+```
+```{r}
+head(county_cases)
+dim(county_cases)
+summary(county_cases$date)
+length(unique(county_cases$county))
+
+head(county_deaths)
+dim(county_deaths)
+summary(county_deaths$date)
+length(unique(county_deaths$county))
+
+head(state_cases)
+dim(state_cases)
+
+head(state_deaths)
+dim(state_deaths)
 ```
 
-## Exploratory Data Analysis
 ```{r}
+head(US_cases)
+dim(US_cases)
 
-# ggplot(data = US, aes(x = date)) +
-#   geom_line(mapping = aes(y = cases), color = 'blue')
-# ggplot(data = US, aes(x = date)) +
-#   geom_line(mapping = aes(y = deaths), color = 'red')
-# 
-# cases_delta <- rbind(0, US[2:nrow(US), 'cases'] - US[1:nrow(US)-1, 'cases'])
-# deaths_delta <- rbind(0, US[2:nrow(US), 'deaths'] - US[1:nrow(US)-1, 'deaths'])
-# US_delta <- US %>% cbind(c(cases_delta, deaths_delta))
-# 
-# ggplot(data = US_delta, aes(x = date)) +
-#   geom_line(mapping = aes(y = cases.1), color = 'blue')
-# ggplot(data = US_delta, aes(x = date)) +
-#   geom_line(mapping = aes(y = deaths.1), color = 'red')
+head(US_deaths)
+dim(US_deaths)
+```
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Dataframe}     & \textbf{Number of Rows} \\ \hline
+County Cases           & 3,493,134              \\ \hline
+County Deaths          & 3,411,037              \\ \hline
+State Cases            & 61,942                 \\ \hline
+State Deaths           & 61,942                 \\ \hline
+US Cases               & 1,158                  \\ \hline
+US Deaths              & 1,158                  \\ \hline
+\end{tabular}
+\caption{Sizes of Cleaned Dataframes}
+\label{tab:dataframe_sizes}
+\end{table}
 
+## Exploratory Data Analysis
+For the county and state levels, I summarized the number of cases and deaths using the mean case and death counts due to the lack of easily-accessible demographic data to calculate prevalence/incidence metrics. 
+```{r}
+county_cases_daily <- county_cases %>%
+  group_by(date) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  ungroup()
+
+county_deaths_daily <- county_deaths %>%
+  group_by(date) %>%
+  summarise(mean_deaths = mean(deaths)) %>%
+  ungroup() %>%
+  mutate(daily_change = mean_deaths - lag(mean_deaths))
+```
+
+```{r}
+state_cases_daily <- state_cases %>%
+  group_by(date) %>%
+  summarise(mean_cases = mean(cases)) %>%
+  ungroup()
+
+state_deaths_daily <- state_deaths %>%
+  group_by(date) %>%
+  summarise(mean_deaths = mean(deaths)) %>%
+  ungroup()
+```
+
+```{r}
+US_cases_daily <- US_cases %>%
+  mutate(daily_change = cases - lag(cases))
+US_deaths_daily <- US_deaths %>%
+  mutate(daily_change = deaths - lag(deaths))
+```
+
+
+```{r}
+county_cases_weekly <- county_cases %>%
+  mutate(week = floor_date(date, unit = "week")) %>%
+  group_by(week) %>%
+  summarise(mean_cases = mean(cases, na.rm = TRUE)) %>%
+  ungroup()
+
+county_deaths_weekly <- county_deaths %>%
+  mutate(week = floor_date(date, unit = "week")) %>%
+  group_by(week) %>%
+  summarise(mean_deaths = mean(deaths, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(weekly_change = mean_deaths - lag(mean_deaths))
+```
+
+```{r}
+state_cases_weekly <- state_cases %>%
+  mutate(week = floor_date(date, unit = "week")) %>%
+  group_by(week) %>%
+  summarise(mean_cases = mean(cases, na.rm = TRUE)) %>%
+  ungroup()
+
+state_deaths_weekly <- state_deaths %>%
+  mutate(week = floor_date(date, unit = "week")) %>%
+  group_by(week) %>%
+  summarise(mean_deaths = mean(deaths, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(weekly_change = mean_deaths - lag(mean_deaths))
+```
+
+```{r}
+US_cases_weekly <- US_cases %>%
+  mutate(week = floor_date(date, unit = "week")) %>%
+  group_by(week) %>%
+  summarise(cases = max(cases, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(weekly_change = cases - lag(cases))
+
+US_deaths_weekly <- US_deaths %>%
+  mutate(week = floor_date(date, unit = "week")) %>%
+  group_by(week) %>%
+  summarise(deaths = max(deaths, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(weekly_change = deaths - lag(deaths))
+```
+
+
+```{r}
+county_cases_monthly <- county_cases %>%
+  mutate(month = floor_date(date, unit = "month")) %>%
+  group_by(month) %>%
+  summarise(mean_cases = mean(cases, na.rm = TRUE)) %>%
+  ungroup()
+
+county_deaths_monthly <- county_deaths %>%
+  mutate(month = floor_date(date, unit = "month")) %>%
+  group_by(month) %>%
+  summarise(mean_deaths = mean(deaths, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(monthly_change = mean_deaths - lag(mean_deaths))
+```
+
+```{r}
+state_cases_monthly <- state_cases %>%
+  mutate(month = floor_date(date, unit = "month")) %>%
+  group_by(month) %>%
+  summarise(mean_cases = mean(cases, na.rm = TRUE)) %>%
+  ungroup()
+
+state_deaths_monthly <- state_deaths %>%
+  mutate(month = floor_date(date, unit = "month")) %>%
+  group_by(month) %>%
+  summarise(mean_deaths = mean(deaths, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(monthly_change = mean_deaths - lag(mean_deaths))
+```
+
+```{r}
+US_cases_monthly <- US_cases %>%
+  mutate(month = floor_date(date, unit = "month")) %>%
+  group_by(month) %>%
+  summarise(cases = max(cases, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(monthly_change = cases - lag(cases))
+
+US_deaths_monthly <- US_deaths %>%
+  mutate(month = floor_date(date, unit = "month")) %>%
+  group_by(month) %>%
+  summarise(deaths = max(deaths, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(monthly_change = deaths - lag(deaths))
+```
+
+
+```{r}
+county_cases_daily$frequency <- "Daily"
+county_cases_weekly$frequency <- "Weekly"
+county_cases_monthly$frequency <- "Monthly"
+
+county_cases_daily <- county_cases_daily %>% rename(time = date)
+county_cases_weekly <- county_cases_weekly %>% rename(time = week)
+county_cases_monthly <- county_cases_monthly %>% rename(time = month)
+
+combined_county_cases <- bind_rows(county_cases_daily, county_cases_weekly, county_cases_monthly) %>%
+  mutate(frequency = factor(frequency, levels = c("Daily", "Weekly", "Monthly")))
+
+ggplot(data = combined_county_cases) +
+  geom_line(mapping = aes(x = time, y = mean_cases, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "County-Level COVID-19 Cases by Frequency", x = "Time", y = "Mean Cases") +
+  theme_minimal()
+```
+```{r}
+county_deaths_daily$frequency <- "Daily"
+county_deaths_weekly$frequency <- "Weekly"
+county_deaths_monthly$frequency <- "Monthly"
+
+county_deaths_daily <- county_deaths_daily %>% rename(time = date)
+county_deaths_weekly <- county_deaths_weekly %>% rename(time = week)
+county_deaths_monthly <- county_deaths_monthly %>% rename(time = month)
+
+combined_county_deaths <- bind_rows(county_deaths_daily, county_deaths_weekly, county_deaths_monthly) %>%
+  mutate(frequency = factor(frequency, levels = c("Daily", "Weekly", "Monthly")))
+
+ggplot(data = combined_county_deaths) +
+  geom_line(mapping = aes(x = time, y = mean_deaths, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "County-Level COVID-19 Deaths by Frequency", x = "Time", y = "Mean Deaths") +
+  theme_minimal()
+```
+```{r}
+state_cases_daily$frequency <- "Daily"
+state_cases_weekly$frequency <- "Weekly"
+state_cases_monthly$frequency <- "Monthly"
+
+state_cases_daily <- state_cases_daily %>% rename(time = date)
+state_cases_weekly <- state_cases_weekly %>% rename(time = week)
+state_cases_monthly <- state_cases_monthly %>% rename(time = month)
+
+combined_state_cases <- bind_rows(state_cases_daily, state_cases_weekly, state_cases_monthly) %>%
+  mutate(frequency = factor(frequency, levels = c("Daily", "Weekly", "Monthly")))
+
+ggplot(data = combined_state_cases) +
+  geom_line(mapping = aes(x = time, y = mean_cases, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "State-Level COVID-19 Cases by Frequency", x = "Time", y = "Mean Cases") +
+  theme_minimal()
+```
+```{r}
+state_deaths_daily$frequency <- "Daily"
+state_deaths_weekly$frequency <- "Weekly"
+state_deaths_monthly$frequency <- "Monthly"
+
+state_deaths_daily <- state_deaths_daily %>% rename(time = date)
+state_deaths_weekly <- state_deaths_weekly %>% rename(time = week)
+state_deaths_monthly <- state_deaths_monthly %>% rename(time = month)
+
+combined_state_deaths <- bind_rows(state_deaths_daily, state_deaths_weekly, state_deaths_monthly) %>%
+  mutate(frequency = factor(frequency, levels = c("Daily", "Weekly", "Monthly")))
+
+ggplot(data = combined_state_deaths) +
+  geom_line(mapping = aes(x = time, y = mean_deaths, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "State-Level COVID-19 Deaths by Frequency", x = "Time", y = "Mean Deaths") +
+  theme_minimal()
+```
+```{r}
+US_cases_daily$frequency <- "Daily"
+US_cases_weekly$frequency <- "Weekly"
+US_cases_monthly$frequency <- "Monthly"
+
+US_cases_daily <- US_cases_daily %>% rename(time = date, change = daily_change)
+US_cases_weekly <- US_cases_weekly %>% rename(time = week, change = weekly_change)
+US_cases_monthly <- US_cases_monthly %>% rename(time = month, change = monthly_change)
+
+combined_US_cases <- bind_rows(US_cases_daily, US_cases_weekly, US_cases_monthly) %>%
+  mutate(frequency = factor(frequency, levels = c("Daily", "Weekly", "Monthly")))
+
+ggplot(data = combined_US_cases) +
+  geom_line(mapping = aes(x = time, y = cases, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "National-Level COVID-19 Cases by Frequency", x = "Time", y = "Cases") +
+  theme_minimal()
+ggplot(data = combined_US_cases) +
+  geom_line(mapping = aes(x = time, y = change, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "National-Level Change in COVID-19 Cases", x = "Time", y = "Cases") +
+  theme_minimal()
+```
+```{r}
+US_deaths_daily$frequency <- "Daily"
+US_deaths_weekly$frequency <- "Weekly"
+US_deaths_monthly$frequency <- "Monthly"
+
+US_deaths_daily <- US_deaths_daily %>% rename(time = date, change = daily_change)
+US_deaths_weekly <- US_deaths_weekly %>% rename(time = week, change = weekly_change)
+US_deaths_monthly <- US_deaths_monthly %>% rename(time = month, change = monthly_change)
+
+combined_US_deaths <- bind_rows(US_deaths_daily, US_deaths_weekly, US_deaths_monthly) %>%
+  mutate(frequency = factor(frequency, levels = c("Daily", "Weekly", "Monthly")))
+
+ggplot(data = combined_US_deaths) +
+  geom_line(mapping = aes(x = time, y = deaths, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "National-Level COVID-19 deaths by Frequency", x = "Time", y = "Deaths") +
+  theme_minimal()
+ggplot(data = combined_US_deaths) +
+  geom_line(mapping = aes(x = time, y = change, color = frequency), show.legend = FALSE) +
+  facet_grid(. ~ frequency, scales = "free_x") +
+  labs(title = "National-Level Change in COVID-19 deaths", x = "Time", y = "Deaths") +
+  theme_minimal()
 ```
 
 ## Summary
+This analysis explored COVID-19 case and death rates across different temporal resolutions (daily, weekly, and monthly) and geographical levels (county, state, and national). Key findings from the exploratory data analysis revealed distinct patterns of fluctuation in both cases and deaths depending on the level of temporal aggregation. Daily data exhibited significant variability, which was smoothed out in weekly and monthly trends, offering clearer insights into long-term patterns. Geographically, county-level data provided granular insights into local outbreaks, while state and national aggregations highlighted broader trends and peaks in the pandemic trajectory.
+
+The methodology involved cleaning and restructuring datasets to address missing values and inconsistencies, particularly in county-level data. Visualizations such as line plots of mean cases and deaths for each temporal resolution allowed for effective comparison. These insights suggest that the choice of timeframe and geographical level significantly impacts the interpretation of trends, emphasizing the importance of aligning analytical approaches with specific research or policy goals.
+
+The analysis provides actionable insights for public health officials, highlighting the utility of aggregated data for strategic decision-making and the importance of detailed data for localized interventions. However, limitations include the lack of additional demographic variables and the potential impact of unrecorded data. Future work could incorporate more comprehensive datasets to examine disparities and refine predictive modeling for public health planning.
